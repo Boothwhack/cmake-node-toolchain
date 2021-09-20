@@ -1,0 +1,5 @@
+{
+  "name": "@beeswax/toolchain",
+  "bin": "toolchain.js",
+  "version": "1.0.0"
+}
