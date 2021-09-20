@@ -6,7 +6,8 @@
   "bugs": "https://github.com/boothwhack/cmake-node-toolchain/issues",
   "os": [
     "win32",
-    "linux"
+    "linux",
+    "darwin"
   ],
   "cpu": [
     "x64",
