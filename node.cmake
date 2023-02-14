@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-set(CMAKE_SHARED_LIBRARY_SUFFIX ".node")
-set(CMAKE_SHARED_LIBRARY_SUFFIX_C ".node")
-set(CMAKE_SHARED_LIBRARY_SUFFIX_CXX ".node")
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
-set(CMAKE_SHARED_LIBRARY_PREFIX_C "")
-set(CMAKE_SHARED_LIBRARY_PREFIX_CXX "")
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Assume package.json is in the same directory as CMakeLists.txt
@@ -56,3 +49,16 @@ macro(scan_modules module_dir)
     endforeach ()
 endmacro()
 scan_modules("${NODE_PACKAGE_DIR}/node_modules")
+
+# Utility to generate .node module from a shared library target
+function(node_module target module_name)
+    get_target_property(target_type ${target} TYPE)
+    if (NOT target_type STREQUAL "SHARED_LIBRARY")
+        message(FATAL_ERROR "Cannot create node native module for '${target}', it is not a shared library.")
+    endif ()
+
+    set_target_properties(${target} PROPERTIES
+            PREFIX ""
+            SUFFIX ".node")
+    target_compile_definitions(${target} PRIVATE "NODE_GYP_MODULE_NAME=${module_name}")
+endfunction()
