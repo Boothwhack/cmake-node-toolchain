@@ -12,6 +12,12 @@
     "deep-eql": "^4.1.3",
     "mocha": "^10.2.0"
   },
+  "files": [
+    "cmake/",
+    "lib/",
+    "node.cmake",
+    "toolchain.js"
+  ],
   "os": [
     "win32",
     "linux",
