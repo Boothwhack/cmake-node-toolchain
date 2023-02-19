@@ -30,7 +30,7 @@ const CMakeContext = require("./lib/CMakeContext");
         }
     }
 
-    const {options: {sourceDir, buildDir, config}, command: {command, options: {clean}}} = parseArgs(
+    const {options: {sourceDir, buildDir, config}, command: {command, options: {clean}}, rest} = parseArgs(
         process.argv.slice(2),
         {
             options: {
@@ -71,7 +71,7 @@ const CMakeContext = require("./lib/CMakeContext");
             if (config !== undefined) extraOptions.push("--config", config);
 
             await cmake.setupBuildDir(clean);
-            await cmake.configure();
+            await cmake.configure(rest);
             await cmake.build(extraOptions);
 
             break;
