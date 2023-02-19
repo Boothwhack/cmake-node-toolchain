@@ -20,17 +20,18 @@ const CMakeContext = require("./lib/CMakeContext");
                 "Options:\n" +
                 "  -h, --help                       Show this message\n" +
                 "  -S <path>, --source-dir=<path>   CMake project source directory. Defaults to current working directory.\n" +
-                "  -B <path>, --build-dir=<path>    Build directory, relative to the source directory.\n" +
+                "  -B <path>, --build-dir=<path>    Build directory, relative to the source directory. Defaults to 'build'.\n" +
                 "  --config <config>                CMake build configuration; Debug, Release, etc.\n" +
                 "\n" +
                 "Build options:\n" +
-                "  -c, --clean                      Clean build directory before building."
+                "  -c, --clean                      Clean build directory before building.\n" +
+                "  -t <tgt...>, --target=<tgt>      Specify which CMake target(s) to build."
             );
             return;
         }
     }
 
-    const {options: {sourceDir, buildDir, config}, command: {command, options: {clean}}, rest} = parseArgs(
+    const {options: {sourceDir, buildDir, config}, command: {command, options: {clean, targets}}, rest} = parseArgs(
         process.argv.slice(2),
         {
             options: {
@@ -54,6 +55,11 @@ const CMakeContext = require("./lib/CMakeContext");
                         clean: {
                             flag: ["-c", "--clean"],
                         },
+                        targets: {
+                            flag: ["-t", "--target"],
+                            value: "tgt...",
+                            variadic: true,
+                        }
                     },
                 },
                 {
@@ -67,12 +73,14 @@ const CMakeContext = require("./lib/CMakeContext");
         case "build": {
             const cmake = new CMakeContext({sourceDir, buildDir});
 
-            const extraOptions = [];
-            if (config !== undefined) extraOptions.push("--config", config);
+            const buildArguments = [];
+            if (config !== undefined) buildArguments.push("--config", config);
+            if (Array.isArray(targets) && targets.length > 0)
+                buildArguments.push("-t", ...targets);
 
             await cmake.setupBuildDir(clean);
             await cmake.configure(rest);
-            await cmake.build(extraOptions);
+            await cmake.build(buildArguments);
 
             break;
         }
